@@ -19,20 +19,20 @@ Docker在一个容器中运行每个进程。所有这些容器都在主机上�
 {width=100%}
 ![图2:Dockerfiles、镜像、容器](images/diagram2.png)
 
-Fortunately for us, we usually don't have to build our own images from scratch. Most popular software platforms (including PHP) have images that are officially provided by the developers of the software, or by groups of interested users. You will rarely need to build a completely new image, but later we'll see how to extend an existing image by writing your own Dockerfile.
+幸运的是，我们通常不需要从头构建自己的镜像。大多数流行的软件平台(包括PHP)都有由软件开发人员或感兴趣的社区维护的镜像。您很少需要构建一个全新的镜像，但是稍后我们将会讲解到如何通过编写自己的Dockerfile来扩展现有镜像。
 
-Docker images can be built and stored on your host machine, or they can live in a remote "registry". In addition to maintaining the core Docker platform, the Docker team maintains a large registry called [Docker Hub](https://hub.docker.com/), where public images can be stored for free. Most open source software teams host official images on Docker Hub, including [PHP](https://hub.docker.com/_/php/).
+Docker映像可以构建并存储在主机上，也可以保存在远程"registry"中。除了维护核心的Docker平台之外，Docker团队还维护一个名为[Docker Hub](https://hub.docker.com/)镜像管理平台，在这里可以免费存储公共镜像。大多数开源软件团队在Docker Hub上托管官方镜像，包括[PHP](https://hub.docker.com/_/php/)。
 
-## Getting a PHP Docker Image
+## 获取PHP Docker 镜像
 
-In order to run our hello.php script in a container, we first need to "pull" an image for PHP. Let's start with the latest stable version of PHP. In your terminal, run:
+为了在容器中运行hello.php脚本，首先需要为*pull*一个PHP镜像，选择PHP的最新稳定版本。在你的终端中运行:
 
 {linenos=off, lang=sh}
 ~~~~~~~
 $ docker pull php:latest
 ~~~~~~~
 
-You should see something like this in your terminal:
+你应该在你的终端看到类似这样的东西:
 
 {linenos=off, lang=sh}
 ~~~~~~~
@@ -46,53 +46,53 @@ b808e084c9be: Downloading  7.222MB/9.858MB
 1d362d99e847: Waiting
 ~~~~~~~
 
-This indicates that Docker is pulling the version of the PHP image tagged latest. When it's done, Docker will indicate that it has pulled the latest version by showing you a status like this:
+这表示Docker正在拉取PHP最新版镜像。当它完成时，Docker会显示一个如下的状态，表明它已经获取了最新的版本:
 
 {linenos=off, lang=sh}
 ~~~~~~~
 Status: Downloaded newer image for php:latest
 ~~~~~~~
 
-Note: The "latest" tag is a standard convention that most Docker images use for the most up-to-date version of their software. Beware using “latest” indiscriminately as it will automatically track the “latest” version even when there is a major version change.
+注意:“latest”标记是大多数Docker映像用于其软件的最新版本的标准约定。不要不加区分地使用“latest”，因为它会自动检索到“latest”版本，即使有重大的版本更改。
 
-Since our hello.php script is simple, it doesn't matter which version of PHP we use, but what if we need to run an older version of PHP for an existing project? This is where Docker truly shines as we just need to specify the PHP version when we run docker pull. For example, to download the PHP 5.6 image, we just run:
+因为hello.php脚本很简单，所以我们使用哪个版本的PHP并不重要，但是如果我们需要为一个现有项目运行一个旧版本的PHP呢?这是Docker真正的亮点，因为我们只需要在运行Docker pull时指定PHP版本。例如，要下载PHP 5.6镜像，只需运行如下代码：
 
 {linenos=off, lang=sh}
 ~~~~~~~
 $ docker pull php:5.6
 ~~~~~~~
 
-We can use this method to get newer, and unreleased versions of PHP as well (assuming there's a at least a Beta version on the [PHP registry's list](https://hub.docker.com/_/php/)). This makes running PHP in Docker very helpful for developers who need to work with multiple versions of PHP on a regular basis.
+我们也可以使用这个方法来获得更新的、未发布的PHP版本(假设[PHP registry's list](https://hub.docker.com/_/php/)中至少有一个Beta版本)。这使得在Docker中运行PHP对于需要经常使用多个PHP版本的开发人员非常有帮助。
 
-## Getting Code Into a Container
+## 将代码放入容器中
 
-In order to understand the next step, you have to know a little bit about how Docker accesses files on the host system. A running container can't just reach down and read or write files to your computer - that container is essentially its own isolated system. Instead, we have to run containers with data from the host system mounted in a [volume](https://docs.docker.com/engine/admin/volumes/volumes/) or add code while building the image.
+为了理解下一步，您必须稍微了解Docker如何访问主机系统上的文件。一个正在运行的容器不能直接向下读取或写入文件到您的计算机—该容器本质上它是独立的系统。相反，我们要运行的容器数据来自于主机中挂载的[volume](https://docs.docker.com/engine/admin/volumes/volumes/)或者在构建镜像时添加代码。
 
-Later in this book we'll cover building Docker images from Dockerfiles and adding code that way, but for this simple Hello World! example, we're just going to mount the hello.php file into our PHP container using a volume.
+在本书的后面，我们将介绍如何从Dockerfiles构建Docker映像并以这种方式添加代码，但是对于这个简单的Hello World!例如，我们将安装hello.php 文件的磁盘挂载到我们需要运行的PHP容器中。
 
-## Running our Hello World script in Docker
+## 在Docker中运行Hello World脚本
 
-Now that we've pulled a couple PHP images from Docker Hub and we know a little about how Docker uses volumes, we can run our script in a container from the terminal:
+现在我们已经从Docker Hub中获取了一些PHP镜像，并且对Docker如何使用卷有了一些了解，我们可以在终端的容器中运行我们的脚本:
 
 {linenos=off, lang=sh}
 ~~~~~~~
 $ docker run --rm -v $(pwd):/app php:latest php /app/hello.php
 ~~~~~~~
 
-If everything was done correctly, you should see Hello World! in your command line. You just ran your first PHP script in Docker!
+如果一切正确，你在命令行中应该看到输出Hello World!。您刚刚在Docker中运行了第一个PHP脚本!
 
-### What's going on here?
+### 它是如何运行的?
 
-Let's go over that Docker command and what it all meant:
+让我们回顾一下Docker命令以及它的含义:
 
-* `docker run` - This is Docker's command to [run a command within a new container](https://docs.docker.com/engine/reference/run/). There are a lot of options that you can pass in, but we'll just start with the basics.
+* `docker run` - 这是Docker的命令 [在新容器中运行命令](https://docs.docker.com/engine/reference/run/).有很多选项可供您输入，但我们将从基础知识开始。
 
-* `--rm` - This tells Docker to "remove" the container after the command is run. Alternatively, you can save the container to run it again, but if you don't eventually remove the container, it will just sit around taking up space, so it's best to set the remove flag in most cases.
+* `--rm` - 这告诉Docker在命令运行后“删除”容器。 或者，您可以保存容器以再次运行它，但如果您最终没有删除容器，它会占用空间，因此在大多数情况下最好设置删除选项。
 
-* `-v $(pwd):/app` - This is telling Docker to [mount a volume](https://docs.docker.com/engine/tutorials/dockervolumes/). You typically pass in a path to a folder on your host system, a colon, and then a path to the folder in the container. Volumes are a powerful tool, but for this simple example we're just mounting the current directory (using $(pwd)) from our terminal into the /app directory in the new Docker container.
+* `-v $(pwd):/app` - 这是Docker的命令 [mount a volume](https://docs.docker.com/engine/tutorials/dockervolumes/). 通常，您将路径传递到主机系统、冒号、以及容器中文件夹的路径上。 卷是一个强大的工具，但是对于这个简单的示例，我们只是将当前目录(使用$(pwd))从终端挂载到新的Docker容器中的/app目录中。
 
-* `php:latest` - This indicates the image we're using for this container. You could specify another PHP image (eg: php:7.0 or php:5.6) to use a specific version of the language.
+* `php:latest` - 这表示我们为这个容器使用的镜像。您也可以指定其他的PHP镜像(例如:PHP:7.0或PHP:5.6)来使用该语言的特定版本。
 
-* `php /app/hello.php` - Finally, this is the command that Docker will run in the container. Since we mounted our code in the /app directory on the container, we have to run our script from that directory.
+* `php /app/hello.php` - 最后，这是Docker将在容器中运行的命令。由于我们将代码挂载在容器的/app目录中，因此必须从该目录运行脚本。
 
-Now that you have a basic understanding of Docker and can run a PHP script within containers, it's time to build something a little more useful and interesting. This might also be a good time to take a break and read up on some of the core Docker concepts [in their documentation](https://docs.docker.com/). When you're ready, read on to start building a PHP web application in Docker.
+现在您已经对Docker有了基本的了解，并且可以在容器中运行PHP脚本，现在是时候构建一些更有用、更有趣的东西了。这也可能是一个休息的好时机，并阅读一些核心的Docker概念(在他们的文件中)(https://doc,docker.com/)当您准备好之后，请继续阅读本文，开始在Docker中构建PHP web应用程序。
